@@ -46,9 +46,14 @@ public class GetCommand extends Command {
 
   private void displayAttributes() throws IOException, JMException {
     Session session = getSession();
+    if (bean.contains("^"))
+    {
+    	bean = bean.replace("^", " ");
+    }
     String beanName = BeanCommand.getBeanName(bean, domain, session);
     ObjectName name = new ObjectName(beanName);
-    session.output.printMessage("mbean = " + beanName + ":");
+  //session.output.printMessage( "mbean = " + beanName + ":" );
+    session.output.printMessage( beanName + ":::" );
     MBeanServerConnection con = session.getConnection().getServerConnection();
     MBeanAttributeInfo[] ais = con.getMBeanInfo(name).getAttributes();
     Map<String, MBeanAttributeInfo> attributeNames =
@@ -98,9 +103,9 @@ public class GetCommand extends Command {
           format.printExpression(session.output, attributeName, result, i.getDescription());
         }
         session.output.print(delimiter);
-        if (!singleLine) {
+        /*if (!singleLine) {
           session.output.println("");
-        }
+        }*/
       } else {
         session.output.printMessage(i.getName() + " is not readable");
       }
