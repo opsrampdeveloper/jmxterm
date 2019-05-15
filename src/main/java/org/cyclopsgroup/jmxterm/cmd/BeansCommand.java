@@ -35,13 +35,21 @@ public class BeansCommand extends Command {
       throws MalformedObjectNameException, IOException {
     ObjectName queryName = null;
     if (domainName != null) {
-      queryName = new ObjectName(domainName + ":*");
+      //queryName = new ObjectName(domainName + ":*");
+    	if (domainName.contains(":"))
+    	{
+    		queryName = new ObjectName( domainName ); 
+    	}
+    	else
+    		queryName = new ObjectName( domainName + ":*" );  
+        
     }
     Set<ObjectName> names =
         session.getConnection().getServerConnection().queryNames(queryName, null);
     List<String> results = new ArrayList<String>(names.size());
     for (ObjectName name : names) {
-      results.add(name.getCanonicalName());
+    	//results.add( name.getCanonicalName() );
+    	results.add( name.toString() );
     }
     Collections.sort(results);
     return results;
@@ -60,7 +68,19 @@ public class BeansCommand extends Command {
   @Override
   public void execute() throws MalformedObjectNameException, IOException {
     Session session = getSession();
-    String domainName = DomainCommand.getDomainName(domain, session);
+    //String domainName = DomainCommand.getDomainName(domain, session);
+    String domainName = "";
+    if (domain.contains(":"))
+	{
+		 String[] coolStringArray = domain.split(":");
+		 //queryName = new ObjectName( coolStringArray[0] + ":"  + coolStringArray[1] +",*" );
+		 domain = coolStringArray[0];
+		 domainName = DomainCommand.getDomainName( domain, session );
+		 domainName = domainName + ":" + coolStringArray[1] ;
+	}
+    else    		
+    	domainName = DomainCommand.getDomainName( domain, session );
+
     List<String> domains = new ArrayList<String>();
     if (domainName == null) {
       domains.addAll(DomainsCommand.getCandidateDomains(session));
@@ -68,7 +88,8 @@ public class BeansCommand extends Command {
       domains.add(domainName);
     }
     for (String d : domains) {
-      session.output.printMessage("domain = " + d + ":");
+       //session.output.printMessage( "domain = " + d );
+      session.output.println( "#domain = " + d );
       for (String bean : getBeans(session, d)) {
         session.output.println(bean);
       }
