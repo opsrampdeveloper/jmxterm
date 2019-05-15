@@ -66,11 +66,13 @@ public class ValueOutputFormat {
     printValue(output, name, indent);
     output.print(" = ");
     printValue(output, value, indent);
-    output.print(";");
+    if(indent != 0)
+    	output.print( "," ); 
     if (showDescription && description != null) {
       output.print(" (" + description + ")");
     }
-    output.println("");
+    if(indent == 0)
+     output.println("");
   }
 
   /**
@@ -113,20 +115,20 @@ public class ValueOutputFormat {
       }
       output.print(" )");
     } else if (Map.class.isAssignableFrom(value.getClass())) {
-      output.println("{ ");
+    output.print( "{" );
       for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
         printExpression(output, entry.getKey(), entry.getValue(), null, indent + indentSize);
       }
-      output.print(StringUtils.repeat(" ", indent) + " }");
+      output.print( StringUtils.repeat( "", indent ) + "}" );
     } else if (CompositeData.class.isAssignableFrom(value.getClass())) {
-      output.println("{ ");
+    	output.print( "{" );
       CompositeData data = (CompositeData) value;
       for (Object key : data.getCompositeType().keySet()) {
         Object v = data.get((String) key);
         printExpression(output, key, v, data.getCompositeType().getDescription((String) key),
             indent + indentSize);
       }
-      output.print(StringUtils.repeat(" ", indent) + " }");
+      output.print( StringUtils.repeat( "", indent ) + "}" );
     } else if (value instanceof String && showQuotationMarks) {
       output.print("\"" + value + "\"");
     } else {
